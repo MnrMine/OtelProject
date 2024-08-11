@@ -1,0 +1,213 @@
+﻿@model List<OtelRezervasyon.EntityLayer.Concrete.Rooms>
+
+@{
+    ViewData["Title"] = "Oda Listesi";
+    Layout = "~/Areas/Admin/Views/AdminLayout/_AdminLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Oda Listesi</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive" id="content">
+            <table class="table table-hover table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>Fotoğraf</th>
+                        <th>Oda Adı</th>
+                        <th>Kapasite</th>
+                        <th>Yatak Sayısı</th>
+                        <th>Alan (m²)</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody id="roomList">
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@item.CoverImageUrl" alt="@item.RoomName" class="img-thumbnail" style="width: 100px; height: auto; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal-@item.RoomsId" onerror="this.src='/images/no-image.png';" />
+                            </td>
+                            <td>@item.RoomName</td>
+                            <td>@item.Capacity</td>
+                            <td>@item.Bed</td>
+                            <td>@item.Square</td>
+                            <td>
+                                <span class="badge bg-@(item.Available ? "success" : "danger")">
+                                    @(item.Available ? "Müsait" : "Dolu")
+                                </span>
+                            </td>
+                            <td>
+                                <a href="@Url.Action("UpdateRoom", "Room", new { area = "Admin", id = item.RoomsId })" class="btn btn-sm btn-warning">Güncelle</a>
+                                <a href="@Url.Action("RemoveRoom", "Room", new { area = "Admin", id = item.RoomsId })" class="btn btn-sm btn-danger">Sil</a>
+                            </td>
+                        </tr>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="imageModal-@item.RoomsId" tabindex="-1" aria-labelledby="imageModalLabel-@item.RoomsId" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="imageModalLabel-@item.RoomsId">@item.RoomName</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <img src="@item.CoverImageUrl" alt="@item.RoomName" class="img-fluid" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination mt-4" id="pagination">
+            <!-- Sayfalama düğmeleri buraya eklenecek -->
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            Henüz oda bulunmamaktadır.
+        </div>
+    }
+
+    <div class="mt-4">
+        <a href="@Url.Action("CreateRoom", "Room", new { area = "Admin" })" class="btn btn-primary">
+            Yeni Oda Ekle
+        </a>
+    </div>
+    <button class="btn btn-success mt-2" onclick="downloadPdf()">PDF Olarak İndir</button>
+    <button class="btn btn-info mt-2" onclick="downloadExcel()">Excel Olarak İndir</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.3/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<script>
+    async function downloadPdf() {
+        const { jsPDF } = window.jspdf;
+        const content = document.getElementById('content');
+
+        await html2canvas(content).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save("RoomList.pdf");
+        });
+    }
+
+    function downloadExcel() {
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.table_to_sheet(document.querySelector('table'));
+        XLSX.utils.book_append_sheet(wb, ws, "Oda Listesi");
+        XLSX.writeFile(wb, "RoomList.xlsx");
+    }
+
+    // Sayfalama işlemi için JavaScript
+    document.addEventListener('DOMContentLoaded', function () {
+        const itemsPerPage = 5;
+        const roomList = document.getElementById('roomList');
+        const pagination = document.getElementById('pagination');
+        const items = roomList.getElementsByTagName('tr');
+        const pageCount = Math.ceil(items.length / itemsPerPage);
+        let currentPage = 1;
+
+        function showPage(page) {
+            for (let i = 0; i < items.length; i++) {
+                items[i].style.display = 'none';
+            }
+
+            const start = (page - 1) * itemsPerPage;
+            const end = page * itemsPerPage;
+
+            for (let i = start; i < end && i < items.length; i++) {
+                items[i].style.display = '';
+            }
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            pagination.innerHTML = '';
+
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Önceki';
+            prevButton.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'me-2');
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener('click', function () {
+                currentPage--;
+                showPage(currentPage);
+            });
+            pagination.appendChild(prevButton);
+
+            for (let i = 1; i <= pageCount; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'me-2');
+                if (i === currentPage) {
+                    pageButton.classList.add('active');
+                    pageButton.classList.replace('btn-outline-primary', 'btn-primary');
+                }
+                pageButton.addEventListener('click', function () {
+                    currentPage = i;
+                    showPage(currentPage);
+                });
+                pagination.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Sonraki';
+            nextButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+            nextButton.disabled = currentPage === pageCount;
+            nextButton.addEventListener('click', function () {
+                currentPage++;
+                showPage(currentPage);
+            });
+            pagination.appendChild(nextButton);
+        }
+
+        showPage(currentPage);
+    });
+</script>
+
+<style>
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .table thead th {
+        background-color: #e9ecef;
+    }
+
+    .table thead th,
+    .table tbody td {
+        vertical-align: middle;
+    }
+
+    .img-thumbnail {
+        max-height: 100px;
+        cursor: pointer;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

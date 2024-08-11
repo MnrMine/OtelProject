@@ -1,0 +1,100 @@
+﻿@model List<OtelRezervasyon.EntityLayer.Concrete.Contact>
+@{
+    ViewData["Title"] = "ContactList";
+    Layout = "~/Areas/Admin/Views/AdminLayout/_AdminLayout.cshtml";
+    int count = 0;
+}
+
+@if (Model != null && Model.Any())
+{
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="titlepage">
+                    <h2>Admin Paneli - İletişim Yönetimi</h2>
+                    <p>İletişimi yönetin</p>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>İletişim Sırası</th>
+                        <th>Adınız Soyadınız</th>
+                        <th>E Mail adresiniz</th>
+                        <th>Mesaj Detayları</th>
+                        <th>Sil</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        count++;
+                        <tr>
+                            <td>@count</td>
+                            <td>@item.Name</td>
+                            <td>@item.Email</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#messageModal-@item.ContactId">
+                                    Mesaj Detayları
+                                </button>
+                            </td>
+                            <td>
+                                <a href="@Url.Action("RemoveContact", "Contact", new { area = "Admin", id = item.ContactId })" class="btn btn-sm btn-danger">Sil</a>
+                            </td>
+                        </tr>
+
+                        <!-- Modal for each message -->
+                        <div class="modal fade" id="messageModal-@item.ContactId" tabindex="-1" aria-labelledby="messageModalLabel-@item.ContactId" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="messageModalLabel-@item.ContactId">Mesaj Detayları</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>Gönderen:</strong> @item.Name</p>
+                                        <p><strong>E-mail:</strong> @item.Email</p>
+                                        <p><strong>Mesaj:</strong></p>
+                                        <p>@item.Message</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<style>
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .table thead th {
+        background-color: #e9ecef;
+    }
+
+    .table thead th,
+    .table tbody td {
+        vertical-align: middle;
+    }
+
+    .img-thumbnail {
+        max-height: 100px;
+        cursor: pointer;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

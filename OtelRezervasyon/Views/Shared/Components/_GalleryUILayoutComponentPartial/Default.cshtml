@@ -1,0 +1,122 @@
+﻿@model List<OtelRezervasyon.EntityLayer.Concrete.Gallery>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galerimiz</title>
+    <style>
+        .gallery {
+            margin: 20px;
+        }
+
+        .gallery_img {
+            margin-bottom: 20px;
+            height: 200px; /* Sabit bir yükseklik belirleyin */
+            overflow: hidden; /* Resmin taşmasını engelleyin */
+            border-radius: 8px;
+        }
+
+            .gallery_img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover; /* Resmi, boyutlara sığacak şekilde kırpın */
+                border-radius: 8px;
+            }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+            .pagination .page-item {
+                margin: 0 5px;
+                list-style: none;
+            }
+
+            .pagination .page-link {
+                color: #007bff;
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                padding: 10px 15px;
+                border-radius: 50%;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+
+            .pagination .page-item.active .page-link {
+                background-color: #007bff;
+                color: white;
+                border-color: #007bff;
+            }
+
+            .pagination .page-link:hover {
+                background-color: #007bff;
+                color: white;
+            }
+    </style>
+</head>
+<body>
+    <div class="gallery">
+        <div class="container">
+            <div class="titlepage">
+                <h2>Galerimiz</h2>
+            </div>
+            <div id="gallery-images" class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-3 col-sm-6 gallery-item" data-imageurl="@item.Imageurl">
+                        <div class="gallery_img">
+                            <figure><img src="@item.Imageurl" alt="#" /></figure>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div id="pagination" class="row"></div>
+        </div>
+    </div>
+
+    <script>
+        const itemsPerPage = 8;
+        let currentPage = 1;
+
+        function displayImages(page) {
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            galleryItems.forEach((item, index) => {
+                item.style.display = (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) ? 'block' : 'none';
+            });
+        }
+
+        function setupPagination() {
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            const pageCount = Math.ceil(galleryItems.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            for (let i = 1; i <= pageCount; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                const a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = i;
+                a.onclick = (e) => {
+                    e.preventDefault();
+                    currentPage = i;
+                    displayImages(currentPage);
+                    setupPagination();
+                };
+                li.appendChild(a);
+                pagination.appendChild(li);
+            }
+        }
+
+        // Initialize
+        displayImages(currentPage);
+        setupPagination();
+    </script>
+</body>
+</html>

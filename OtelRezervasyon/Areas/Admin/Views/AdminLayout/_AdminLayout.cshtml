@@ -1,0 +1,83 @@
+﻿@{
+    Layout = null;
+}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+@await Component.InvokeAsync("_AdminLayoutHeadComponentPartial")
+
+<body>
+    <div class="container-scroller">
+
+        @await Component.InvokeAsync("_AdminLayoutSideBarComponentPartial")
+        <li class="nav-item">
+            <a class="nav-link" href="/Admin/Dashboard/Index">
+                <i class="mdi mdi-home menu-icon"></i>
+                <span class="menu-title">Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/Admin/Gallery/GalleryList">
+                <i class="mdi mdi-database menu-icon"></i>
+                <span class="menu-title">Galeri</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/Admin/Reservation/AdminView">
+                <i class="mdi mdi-database menu-icon"></i>
+                <span class="menu-title">Rezervasyon Yönetimi</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/Admin/About/AboutList">
+                <i class="mdi mdi-comment menu-icon"></i>
+                <span class="menu-title">Hakkımızda</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/Admin/Room/RoomList">
+                <i class="mdi mdi-card menu-icon"></i>
+                <span class="menu-title">Odalar</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="/Admin/Contact/ContactList">
+                <i class="mdi mdi-chart-bar menu-icon"></i>
+                <span class="menu-title">Mesajlar</span>
+            </a>
+        </li> 
+
+
+
+
+
+        <li class="nav-item">
+            <a class="nav-link" href="../../index.html">
+                <i class="mdi mdi-logout menu-icon"></i>
+                <span class="menu-title">Çıkış Yap</span>
+            </a>
+        </li>
+        </ul>
+        </nav>
+
+
+        <div class="container-fluid page-body-wrapper">
+            @await Component.InvokeAsync("_AdminLayoutNavbarComponentPartial")
+
+
+            <div class="main-panel">
+                @RenderBody()
+
+
+            </div>
+        </div>
+    </div>
+    @await Component.InvokeAsync("_AdminLayoutScriptComponentPartial")
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+

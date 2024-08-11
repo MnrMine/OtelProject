@@ -1,0 +1,39 @@
+﻿@model OtelRezervasyon.EntityLayer.Concrete.About
+@{
+    ViewData["Title"] = "UpdateAbout";
+    Layout = "~/Areas/Admin/Views/AdminLayout/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Galeriyi Güncelle</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @using (Html.BeginForm("UpdateAbout", "About", FormMethod.Post, new { @class = "mt-4" }))
+                    {
+                        @Html.HiddenFor(model => model.AboutId) <!-- Varsayılan olarak ID'yi gizli bir alan olarak gönderiyoruz -->
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ImageUrl, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ImageUrl, new { @class = "form-control", placeholder = "Link" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Title, new { @class = "form-label" })
+                            @Html.TextAreaFor(model => model.Title, new { @class = "form-control", placeholder = "Başlık" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Description, new { @class = "form-label" })
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = "Başlık" })
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Güncelle</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

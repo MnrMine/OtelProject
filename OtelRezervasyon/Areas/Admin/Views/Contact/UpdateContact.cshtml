@@ -1,0 +1,44 @@
+﻿@model OtelRezervasyon.EntityLayer.Concrete.Contact
+
+@{
+    ViewData["Title"] = "UpdateContact";
+    Layout = "~/Areas/Admin/Views/AdminLayout/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">İletişim Adresini Güncelle</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @using (Html.BeginForm("UpdateContact", "Contact", FormMethod.Post, new { @class = "mt-4" }))
+                    {
+                        @Html.HiddenFor(model => model.ContactId) <!-- Varsayılan olarak ID'yi gizli bir alan olarak gönderiyoruz -->
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Name, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "Adınız Soyadınız" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Email, new { @class = "form-label" })
+                            @Html.TextAreaFor(model => model.Email, new { @class = "form-control", placeholder = "E Mail Adresiniz" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Message, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Message, new { @class = "form-control", placeholder = "Mesajınız" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Date, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Date, new { @class = "form-control", placeholder = "Mesaj Tarihi" })
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

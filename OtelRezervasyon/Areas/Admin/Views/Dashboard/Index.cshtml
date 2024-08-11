@@ -1,0 +1,254 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/AdminLayout/_AdminLayout.cshtml";
+}
+
+
+@using System.Text.Json
+
+<div class="container mt-4">
+    <h2 class="mb-4">Dashboard</h2>
+
+    <!-- Haftalık Hava Durumu Kartı -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3> Haftalık Hava Durumu</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-nowrap overflow-auto text-center">
+                <div class="weather-card bg-primary text-white p-3 rounded mx-2">
+                    <h5>Pazartesi</h5>
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/partly-cloudy-day.png" alt="Güneşli" />
+                    <p>35°C / 26°C</p>
+                    <p>Güneşli</p>
+                </div>
+                <div class="weather-card bg-success text-white p-3 rounded mx-2">
+                    <h5>Salı</h5>
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/sun.png" alt="Güneşli" />
+                    <p>36°C / 28°C</p>
+                    <p>Güneşli</p>
+                </div>
+                <div class="weather-card bg-warning text-white p-3 rounded mx-2">
+                    <h5>Çarşamba</h5>
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/rain.png" alt="Yağmurlu" />
+                    <p>39°C / 28°C</p>
+                    <p>Güneşli</p>
+                </div>
+                <div class="weather-card bg-danger text-white p-3 rounded mx-2">
+                    <h5>Perşembe</h5>
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/sun.png" alt="Güneşli" />
+                    <p>39°C / 27°C</p>
+                    <p>Güneşli</p>
+                </div>
+                <div class="weather-card bg-info text-white p-3 rounded mx-2">
+                    <h5>Cuma</h5>
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/partly-cloudy-night.png" alt="Güneşli" />
+                    <p>37°C / 28°C</p>
+                    <p>Güneşli</p>
+                </div>
+                <div class="weather-card bg-secondary text-white p-3 rounded mx-2">
+                    <h5>Cumartesi</h5>
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/sun.png" alt="Güneşli" />
+                    <p>35°C / 26°C</p>
+                    <p>Güneşli</p>
+                </div>
+                <div class="weather-card bg-dark text-white p-3 rounded mx-2">
+                    <h5>Pazar</h5>
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/sun.png" alt="Güneşli" />
+                    <p>39°C / 28°C</p>
+                    <p>Güneşli</p>
+                </div>
+            </div>
+        </div>
+        <!-- Toplam Bildirim Kartı -->
+        <!-- Toplam Bildirim Kartı -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Toplam Bildirimler</h3>
+                <i class="bi bi-bell-fill" style="font-size: 24px; color: #007bff;"></i>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="display-4">
+                    @ViewBag.TotalNotifications
+                </h2>
+                <p class="text-muted">Bildirimlerinizin toplam sayısı</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Oda Durumu Grafik Bölümü -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Oda Durumu</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="roomStatusChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Oda Kapasite Grafik Bölümü -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Oda Kapasiteleri</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="roomCapacityChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rezervasyon Durumu Grafik Bölümü -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>Rezervasyon Durumu Dağılımı</h3>
+        </div>
+        <div class="card-body">
+            <canvas id="reservationStatusChart" width="400" height="300"></canvas>
+        </div>
+    </div>
+
+    <!-- Pending Oda Tablosu -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>Rezervasyon Onayı Bekleyen Odalar</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Oda ID</th>
+                        <th>Oda Adı</th>
+                        <th>Kapasite</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var room in ViewBag.PendingReservations)
+                    {
+                        <tr>
+                            <td>@room.RoomsId</td>
+                            <td>@room.RoomName</td>
+                            <td>@room.Capacity</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Oda Durumu Grafiği
+            var roomStatusCtx = document.getElementById('roomStatusChart').getContext('2d');
+            var roomStatusChart = new Chart(roomStatusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Dolu Odalar', 'Boş Odalar'],
+                    datasets: [{
+                        label: 'Oda Durumu',
+                        data: [@ViewBag.OccupiedRooms, @ViewBag.AvailableRooms],
+                        backgroundColor: ['#FF6384', '#36A2EB'],
+                        hoverBackgroundColor: ['#FF6384', '#36A2EB']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Oda Durumu'
+                        }
+                    }
+                }
+            });
+
+            // Oda Kapasite Grafiği
+            var roomCapacityCtx = document.getElementById('roomCapacityChart').getContext('2d');
+            var roomCapacities = @Html.Raw(JsonSerializer.Serialize(ViewBag.RoomCapacities));
+            var roomCapacityLabels = roomCapacities.map(r => `Oda ${r.RoomsId}`);
+            var roomCapacityData = roomCapacities.map(r => r.Capacity);
+
+            var roomCapacityChart = new Chart(roomCapacityCtx, {
+                type: 'bar',
+                data: {
+                    labels: roomCapacityLabels,
+                    datasets: [{
+                        label: 'Oda Kapasiteleri',
+                        data: roomCapacityData,
+                        backgroundColor: '#36A2EB',
+                        borderColor: '#36A2EB',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Oda Kapasiteleri'
+                        }
+                    },
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Rezervasyon Durumu Grafiği (Çubuk Grafik)
+            var reservationStatusCtx = document.getElementById('reservationStatusChart').getContext('2d');
+            var reservationStatusData = @Html.Raw(JsonSerializer.Serialize(ViewBag.ReservationStatusData));
+            var reservationStatusLabels = reservationStatusData.map(r => r.Status);
+            var reservationStatusCounts = reservationStatusData.map(r => r.Count);
+
+            var reservationStatusChart = new Chart(reservationStatusCtx, {
+                type: 'bar', // Çubuk grafik
+                data: {
+                    labels: reservationStatusLabels,
+                    datasets: [{
+                        label: 'Rezervasyon Durumu',
+                        data: reservationStatusCounts,
+                        backgroundColor: '#FFCE56',
+                        borderColor: '#FFCE56',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Rezervasyon Durumu Dağılımı'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

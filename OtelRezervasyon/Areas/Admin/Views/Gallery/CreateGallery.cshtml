@@ -1,0 +1,33 @@
+﻿@model OtelRezervasyon.EntityLayer.Concrete.Gallery
+@{
+    ViewData["Title"] = "CreateGallery";
+    Layout = "~/Areas/Admin/Views/AdminLayout/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Yeni Oda Ekle</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @using (Html.BeginForm("CreateGallery", "Gallery", FormMethod.Post, new { @class = "mt-4" }))
+                    {
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Imageurl, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Imageurl, new { @class = "form-control", placeholder = " Link" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Title, new { @class = "form-label" })
+                            @Html.TextAreaFor(model => model.Title, new { @class = "form-control", placeholder = "Title" })
+                        </div>
+   
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+﻿@model OtelRezervasyon.EntityLayer.Concrete.Rooms
+
+@{
+    ViewData["Title"] = "Yeni Oda Ekle";
+    Layout = "~/Areas/Admin/Views/AdminLayout/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Yeni Oda Ekle</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @using (Html.BeginForm("CreateRoom", "Room", FormMethod.Post, new { @class = "mt-4" }))
+                    {
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.RoomName, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.RoomName, new { @class = "form-control", placeholder = "Oda Adı" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Description, new { @class = "form-label" })
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = "Açıklama" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Capacity, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Capacity, new { @class = "form-control", placeholder = "Kapasite" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Bed, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Bed, new { @class = "form-control", placeholder = "Yatak Sayısı" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Square, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Square, new { @class = "form-control", placeholder = "Alan (m²)" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Available, new { @class = "form-label" })
+                            @Html.DropDownListFor(model => model.Available, new SelectList(new List<SelectListItem>
+                        {
+                        new SelectListItem { Text = "Müsait", Value = "true" },
+                        new SelectListItem { Text = "Dolu", Value = "false" }
+                        }), new { @class = "form-control" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.CoverImageUrl, new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.CoverImageUrl, new { @class = "form-control", placeholder = "Resim URL" })
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

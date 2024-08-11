@@ -1,0 +1,243 @@
+﻿@model List<OtelRezervasyon.EntityLayer.Concrete.Rooms>
+
+@{
+    ViewData["Title"] = "AdminView";
+    Layout = "~/Areas/Admin/Views/AdminLayout/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="titlepage">
+                <h2>Admin Paneli - Rezervasyon Yönetimi</h2>
+                <p>Odalar ve rezervasyon durumlarını yönetin</p>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="table-responsive" id="content">
+                <table class="table table-hover table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Oda Adı</th>
+                            <th scope="col">Açıklama</th>
+                            <th scope="col">Resim</th>
+                            <th scope="col">Durum</th>
+                            <th scope="col">Rezervasyon Durumu</th>
+                            <th scope="col">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roomList">
+                        @foreach (var room in Model)
+                        {
+                            <tr>
+                                <td>@room.RoomName</td>
+                                <td>@(room.Description?.Length > 100 ? room.Description.Substring(0, 97) + "..." : room.Description)</td>
+                                <td>
+                                    <img src="@room.CoverImageUrl" alt="@room.RoomName" class="img-thumbnail" style="width: 100px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal-@room.RoomsId" />
+                                </td>
+                                <td>
+                                    <span class="badge @(room.Available ? "bg-success" : "bg-danger")">
+                                        @(room.Available ? "Müsait" : "Dolu")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(room.ReservationStatus == "Approved" ? "bg-success" : room.ReservationStatus == "Pending" ? "bg-warning" : "bg-secondary")">
+                                        @room.ReservationStatus
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (room.ReservationStatus == "Pending")
+                                    {
+                                        <button class="btn btn-success btn-sm" onclick="approveReservation(@room.RoomsId)">Onayla</button>
+                                        <button class="btn btn-danger btn-sm" onclick="rejectReservation(@room.RoomsId)">Reddet</button>
+                                    }
+                                </td>
+                            </tr>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="imageModal-@room.RoomsId" tabindex="-1" aria-labelledby="imageModalLabel-@room.RoomsId" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="imageModalLabel-@room.RoomsId">@room.RoomName</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                            <img src="@room.CoverImageUrl" alt="@room.RoomName" class="img-fluid" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination mt-4" id="pagination">
+                <!-- Sayfalama düğmeleri buraya eklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12 d-flex justify-content-end">
+            <button class="btn btn-success me-2" onclick="downloadPdf()">PDF Olarak İndir</button>
+            <button class="btn btn-info" onclick="downloadExcel()">Excel Olarak İndir</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.75em;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .table thead th {
+        background-color: #e9ecef;
+    }
+
+    .table thead th,
+    .table tbody td {
+        vertical-align: middle;
+    }
+
+    .img-thumbnail {
+        max-height: 100px;
+        cursor: pointer;
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.3/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script>
+    function approveReservation(roomId) {
+        fetch(`/Admin/Reservation/ApproveReservation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(roomId)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Rezervasyon onaylanamadı.');
+                }
+            });
+    }
+
+    function rejectReservation(roomId) {
+        fetch(`/Admin/Reservation/RejectReservation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(roomId)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Rezervasyon reddedilemedi.');
+                }
+            });
+    }
+
+    // Sayfalama işlemi için JavaScript
+    document.addEventListener('DOMContentLoaded', function () {
+        const itemsPerPage = 5;
+        const roomList = document.getElementById('roomList');
+        const pagination = document.getElementById('pagination');
+        const items = roomList.getElementsByTagName('tr');
+        const pageCount = Math.ceil(items.length / itemsPerPage);
+        let currentPage = 1;
+
+        function showPage(page) {
+            for (let i = 0; i < items.length; i++) {
+                items[i].style.display = 'none';
+            }
+
+            const start = (page - 1) * itemsPerPage;
+            const end = page * itemsPerPage;
+
+            for (let i = start; i < end && i < items.length; i++) {
+                items[i].style.display = '';
+            }
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            pagination.innerHTML = '';
+
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Önceki';
+            prevButton.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'me-2');
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener('click', function () {
+                currentPage--;
+                showPage(currentPage);
+            });
+            pagination.appendChild(prevButton);
+
+            for (let i = 1; i <= pageCount; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'me-2');
+                if (i === currentPage) {
+                    pageButton.classList.add('active');
+                    pageButton.classList.replace('btn-outline-primary', 'btn-primary');
+                }
+                pageButton.addEventListener('click', function () {
+                    currentPage = i;
+                    showPage(currentPage);
+                });
+                pagination.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Sonraki';
+            nextButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+            nextButton.disabled = currentPage === pageCount;
+            nextButton.addEventListener('click', function () {
+                currentPage++;
+                showPage(currentPage);
+            });
+            pagination.appendChild(nextButton);
+        }
+
+        showPage(currentPage);
+    });
+
+    async function downloadPdf() {
+        const { jsPDF } = window.jspdf;
+        const content = document.getElementById('content');
+
+        await html2canvas(content).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save("AdminPanel.pdf");
+        });
+    }
+
+    function downloadExcel() {
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.table_to_sheet(document.querySelector('table'));
+        XLSX.utils.book_append_sheet(wb, ws, "Admin Paneli");
+        XLSX.writeFile(wb, "AdminPanel.xlsx");
+    }
+</script>

@@ -1,0 +1,79 @@
+﻿@model OtelRezervasyon.Models.SearchViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+@await Component.InvokeAsync("_HeadUILayoutComponentPartial")
+
+
+<body class="main-layout">
+    <div class="loader_bg">
+        <div class="loader"><img src="~/keto-1.0.0/images/loading.gif" alt="#" /></div>
+    </div>
+
+    @await Component.InvokeAsync("_NavbarUILayoutComponentPartial")
+
+    @await Component.InvokeAsync("_MainCoverUILayoutComponentPartial")
+    <div class="booking_ocline">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="book_room">
+                        <h1>Tarih Seçin</h1>
+                        <form class="book_now" method="post" asp-action="SearchRooms" asp-controller="UILayout">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <span>Giriş Tarihi</span>
+                                    <img class="date_cua" src="~/keto-1.0.0/images/date.png">
+                                    <input class="online_book" placeholder="dd/mm/yyyy" type="date" asp-for="EntryDate">
+                                </div>
+                                <div class="col-md-12">
+                                    <span>Çıkış Tarihi</span>
+                                    <img class="date_cua" src="~/keto-1.0.0/images/date.png">
+                                    <input class="online_book" placeholder="dd/mm/yyyy" type="date" asp-for="ReleaseDate">
+                                </div>
+                                <div class="col-md-12">
+                                    <button class="book_btn">Rezervasyon Yap</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- end banner -->
+    <!-- about -->
+    @await Component.InvokeAsync("_AboutUILayoutComponentPartial")
+    <!-- end about -->
+    <!-- our_room -->
+    @await Component.InvokeAsync("_OurRoomUILayoutComponentPartial")
+    <!-- end our_room -->
+
+   @*   @RenderBody() *@
+
+    <!-- gallery -->
+    @await Component.InvokeAsync("_GalleryUILayoutComponentPartial")
+    
+    <!-- end gallery -->
+    <!-- end blog -->
+    <!--  contact -->
+
+    @await Component.InvokeAsync("_ContactUILayoutComponentPartial")
+    
+    <!-- end contact -->
+    <!--  footer -->
+    @await Component.InvokeAsync("_FooterUILayoutComponentPartial")
+
+    @await Component.InvokeAsync("_ScriptUILayoutComponentPartial")
+
+    <!-- end footer -->
+    <!-- Javascript files-->
+   
+</body>
+</html>
+
+

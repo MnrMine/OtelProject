@@ -1,0 +1,77 @@
+﻿@model List<RapidApiModel>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/UILayout/_UserLayout.cshtml";
+}
+
+<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+<style>
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .card {
+        flex: 1 1 calc(33.333% - 1rem);
+        box-sizing: border-box;
+    }
+
+    .pagination {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card-container" id="cardContainer">
+        @foreach (var item in Model)
+        {
+            <div class="card border-primary mb-3">
+                <div class="card-header">
+                    <h5 class="card-title">@item.localizedName Beach</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">@item.localizedAdditionalNames</h6>
+                    <p class="card-text">Tipi: @item.placeType</p>
+                    <a href="#" class="btn btn-outline-info">Haritada Gör</a>
+                </div>
+            </div>
+        }
+    </div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination" id="pagination"></ul>
+    </nav>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const itemsPerPage = 6; // Sayfa başına gösterilecek kart sayısı
+        const cards = document.querySelectorAll(".card");
+        const pagination = document.getElementById("pagination");
+        const totalPages = Math.ceil(cards.length / itemsPerPage);
+
+        function showPage(page) {
+            cards.forEach((card, index) => {
+                card.style.display = (Math.floor(index / itemsPerPage) + 1 === page) ? "block" : "none";
+            });
+        }
+
+        function setupPagination() {
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement("li");
+                li.className = "page-item";
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    showPage(i);
+                });
+                pagination.appendChild(li);
+            }
+            showPage(1); // İlk sayfayı göster
+        }
+
+        setupPagination();
+    });
+</script>

@@ -1,0 +1,26 @@
+﻿@model List<OtelRezervasyon.EntityLayer.Concrete.About>
+<div class="about">
+    <div class="container-fluid">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+
+                <div class="col-md-5">
+
+
+                    <div class="titlepage">
+                        <h2>@item.Title</h2>
+                        <p>@item.Description </p>
+                        <a class="read_more" href="Javascript:void(0)"> Devamını Oku...</a>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="about_img">
+                    <figure><img src="@item.ImageUrl" alt="#" /></figure>
+                </div>
+                
+            </div>
+            }
+        </div>
+    </div>
+</div>

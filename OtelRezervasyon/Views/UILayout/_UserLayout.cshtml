@@ -1,0 +1,29 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+
+@await Component.InvokeAsync("_HeadUILayoutComponentPartial")
+
+
+<body class="main-layout">
+    <div class="loader_bg">
+        <div class="loader"><img src="~/keto-1.0.0/images/loading.gif" alt="#" /></div>
+    </div>
+
+    @await Component.InvokeAsync("_NavbarUILayoutComponentPartial")
+
+   
+    @RenderBody()
+
+   
+    @await Component.InvokeAsync("_FooterUILayoutComponentPartial")
+
+    @await Component.InvokeAsync("_ScriptUILayoutComponentPartial")
+
+    <!-- end footer -->
+    <!-- Javascript files-->
+
+</body>
+</html>
+
+
