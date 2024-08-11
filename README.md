@@ -10,6 +10,7 @@ Bu proje, ASP.NET Core 6 ve n katmanlı mimari kullanılarak  geliştirilen bir 
 * ASP.NET Core Identity: Kullanıcı kimlik doğrulama ve yetkilendirme yönetimi için kullanıldı.
 * Sayfalama (Pagination): Büyük veri setlerini daha yönetilebilir ve kullanıcı dostu bir şekilde görüntülemek için kullanıldı.
 * Pop-up'lar: Dinamik ve etkileşimli içeriklerin (rezervasyon formları, onay pencereleri vb.) gösterimi için kullanıldı.
+* Rapid Api
 
 ## Mimari
 Proje, uygulamayı belirli katmanlara ayıran n katmanlı mimariyi takip eder:
@@ -21,6 +22,7 @@ Proje, uygulamayı belirli katmanlara ayıran n katmanlı mimariyi takip eder:
 * AJAX Entegrasyonu: Kullanıcı deneyimini, sayfa yenilemesine gerek kalmadan sayfa bölümlerini asenkron olarak güncelleyerek iyileştirir.
 * Sayfalama: Büyük veri setlerini verimli bir şekilde yönetmek için uygulanmıştır, veriler daha yönetilebilir parçalara bölünerek görüntülenir.
 * Pop-up'lar: Rezervasyon onayları ve bildirimler gibi çeşitli etkileşimli görevler için kullanılır.
+* 
 
 # Proje Ekran Görüntüleri
 ![image](https://github.com/user-attachments/assets/567b09c6-c040-43b5-9473-da27b666c880)
